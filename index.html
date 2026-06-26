@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V36 Take-Home Freeze</title>
+    <title>Premium 15K Chit Auction - V40 Final Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -12,6 +12,19 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); }
+        
+        /* GAVEL MOTION STRIKE EFFECT */
+        @keyframes gavelPound {
+            0% { transform: rotate(-18deg); }
+            25% { transform: rotate(8deg); }
+            30% { transform: rotate(10deg); }
+            60% { transform: rotate(-18deg); }
+            100% { transform: rotate(-18deg); }
+        }
+        .animate-gavel {
+            transform-origin: 130px 65px;
+            animation: gavelPound 1.4s cubic-bezier(0.6, 0, 0.2, 1) infinite;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-start p-4 selection:bg-amber-500 selection:text-slate-950">
@@ -19,12 +32,55 @@
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-6 transition-all duration-300">
         <div class="w-full max-w-md glass border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6 text-center">
-            <div class="inline-flex p-4 bg-amber-500/10 rounded-2xl text-amber-500 mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            
+            <!-- HIGH-FIDELITY CARTOON VECTOR ILLUSTRATION MATCHING USER'S PHOTO -->
+            <div class="w-full max-w-[240px] mx-auto bg-slate-900/40 rounded-2xl border border-slate-800/80 p-2 relative">
+                <svg viewBox="0 0 200 150" class="w-full h-auto drop-shadow-[0_10px_15px_rgba(245,158,11,0.1)]">
+                    <!-- Dynamic Spark debris elements triggered right on hit -->
+                    <g fill="#f59e0b" opacity="0.8">
+                        <circle cx="45" cy="115" r="3" class="animate-ping" style="animation-duration: 1.4s" />
+                        <circle cx="115" cy="120" r="2.5" />
+                        <path d="M 35 110 L 25 105 L 30 115 Z" />
+                        <path d="M 125 112 L 138 108 L 130 118 Z" />
+                    </g>
+                    
+                    <!-- Sound Anvil Base Block -->
+                    <g transform="translate(40, 110)">
+                        <ellipse cx="40" cy="15" rx="38" ry="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                        <path d="M 2,15 A 38,12 0 0,0 78,15 L 78,25 A 38,12 0 0,1 2,25 Z" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+                        <ellipse cx="40" cy="15" rx="32" ry="8" fill="#334155"/>
+                    </g>
+                    
+                    <!-- Moving Hand Holding Gavel Group -->
+                    <g class="animate-gavel">
+                        <!-- Wooden Mallet Head -->
+                        <g transform="translate(60, 50) rotate(-15)">
+                            <rect x="0" y="0" width="30" height="45" rx="4" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+                            <rect x="-3" y="6" width="36" height="6" fill="#f59e0b"/>
+                            <rect x="-3" y="33" width="36" height="6" fill="#f59e0b"/>
+                            <!-- Handle shaft connection -->
+                            <path d="M 15,22 L 85,32" stroke="#d97706" stroke-width="7" stroke-linecap="round"/>
+                            <path d="M 15,22 L 85,32" stroke="#78350f" stroke-width="7" stroke-linecap="round" opacity="0.3"/>
+                        </g>
+                        <!-- Arm Sleeve and fist wrapped tightly around mallet shaft -->
+                        <path d="M 130,85 C 122,85 115,80 115,75 C 115,68 125,62 135,62 L 180,50 L 185,78 Z" fill="#ffedd5" stroke="#78350f" stroke-width="2"/>
+                        <g fill="#fde047" stroke="#78350f" stroke-width="1.5">
+                            <rect x="115" y="68" width="10" height="7" rx="3"/>
+                            <rect x="120" y="63" width="10" height="7" rx="3"/>
+                            <rect x="123" y="58" width="10" height="7" rx="3"/>
+                            <rect x="121" y="53" width="10" height="7" rx="3"/>
+                        </g>
+                    </g>
                 </svg>
+                
+                <!-- Micro-badge tag tracker -->
+                <span class="absolute top-2 right-2 flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
+                </span>
             </div>
-            <h1 class="text-3xl font-extrabold text-white tracking-tight">Chit Auction Portal</h1>
+            
+            <h1 class="text-3xl font-black text-white tracking-tight">CHIT AUCTION PORTAL</h1>
             <p class="text-sm text-slate-400">Enter your name to access the live bidding lobby room.</p>
             
             <div class="space-y-4 pt-2">
@@ -43,7 +99,7 @@
         <header class="flex items-center justify-between pt-2">
             <div>
                 <span class="text-xs font-bold text-amber-500 tracking-widest uppercase">Live Portal</span>
-                <h1 class="text-xl font-bold text-white">15K Chit Fund</h1>
+                <h1 class="text-xl font-bold text-white">15K CHIT FUND</h1>
             </div>
             <div class="flex gap-2">
                 <button onclick="backToLoginForm()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium px-3 py-2 rounded-xl text-xs border border-slate-800 transition shadow-sm active:scale-[0.97]">
@@ -174,7 +230,6 @@
         let globalLatestWinnerName = "";
         let myPresenceKey = null;
 
-        // UI Freeze State Tracking
         let isUIValueLocked = false;
         let frozenBidText = "₹0";
         let frozenTakeHomeText = "₹14,500";
@@ -269,7 +324,6 @@
             document.getElementById('auctionStatusLabel').innerText = isAuctionActive ? "LIVE RUNNING" : "WAITING";
             document.getElementById('auctionStatusLabel').className = isAuctionActive ? "text-xs font-bold text-emerald-400" : "text-xs font-bold text-amber-400";
             
-            // FIX RESET PROBLEM: Only rewrite values if UI is not frozen by a recent win!
             if (!isUIValueLocked) {
                 frozenBidText = "₹" + currentBid;
                 frozenTakeHomeText = "₹" + (initialPoolValue - currentBid);
@@ -279,7 +333,6 @@
                 frozenMonthlyPayText = "₹" + (estimatedPay < 0 ? 0 : estimatedPay);
             }
 
-            // Always project the current state tokens accurately
             document.getElementById('highestBid').innerText = frozenBidText;
             document.getElementById('takeHomeDisplay').innerText = frozenTakeHomeText;
             document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayText;
@@ -399,8 +452,8 @@
                     badge.className = "text-xs bg-slate-900/60 border border-slate-800 text-slate-500 px-3 py-1 rounded-full line-through";
                     badge.innerHTML = `🏅 ${name}`;
                 } else if (isEliminated) {
-                    badge.className = "text-xs bg-rose-950/20 border border-rose-900/30 text-rose-500 px-3 py-1 rounded-full";
-                    badge.innerHTML = `❌ ${name} (Quit)`;
+                    badge.className = "text-xs bg-rose-950/40 border-2 border-rose-600 text-rose-400 px-3 py-1 rounded-full font-bold shadow-md flex items-center gap-1 animate-pulse";
+                    badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-rose-600 mr-0.5"></span> 🔴 ${name} (Quit)`;
                 } else {
                     badge.className = "text-xs bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1 rounded-full flex items-center gap-1";
                     badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${name}`;
@@ -455,8 +508,6 @@
 
             activeUser = name;
             localStorage.setItem('chit_session_username', activeUser);
-            
-            // Clear layout freeze on login
             isUIValueLocked = false;
 
             const userPresenceRef = presenceRef.push();
@@ -510,15 +561,12 @@
 
         function triggerStartAuction() {
             if (activeUser.toLowerCase() !== 'bhagath') return;
-            playSound('click'); 
-            eliminationsRef.remove();
-            
-            // UNLOCK Values instantly when Bhagath triggers a brand new month auction round!
+            playSound('click'); eliminationsRef.remove();
             isUIValueLocked = false;
-            
             auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: true, isProcessing: false });
         }
 
+        /* Standard Bidding Hook */
         function placeBid() {
             if (!isAuctionActive || isUserAlreadyWinner) return;
             playSound('click');
@@ -552,9 +600,9 @@
             if (isProcessingWinner) return;
             isProcessingWinner = true;
             
-            // LOCK ALL NUMBERS ON SCREEN IMMEDIATELY AT THE WINNING MOMENT!
             isUIValueLocked = true;
             frozenBidText = "₹" + finalBid;
+            
             const takeHomeAmt = initialPoolValue - finalBid;
             frozenTakeHomeText = "₹" + takeHomeAmt;
             
@@ -562,7 +610,6 @@
             const finalPayAmt = Math.round(1500 - finalDividendCalculated);
             frozenMonthlyPayText = "₹" + (finalPayAmt < 0 ? 0 : finalPayAmt);
 
-            // Push frozen tokens immediately into view strings
             document.getElementById('highestBid').innerText = frozenBidText;
             document.getElementById('takeHomeDisplay').innerText = frozenTakeHomeText;
             document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayText;
@@ -601,7 +648,6 @@
                 if (activeUser.toLowerCase() === 'bhagath' || activeUser.toLowerCase().trim() === winnerName.toLowerCase().trim()) {
                     if (banner) banner.classList.add('hidden');
                     eliminationsRef.remove();
-                    // Firebase sets to 0 but our UI remains locked onto frozen values until next round starts!
                     auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: false, isProcessing: false });
                 }
             }, 5000);
