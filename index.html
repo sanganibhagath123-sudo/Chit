@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V34 Final Polish</title>
+    <title>Premium 15K Chit Auction - V35 Ultimate Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -46,7 +46,6 @@
                 <h1 class="text-xl font-bold text-white">15K Chit Fund</h1>
             </div>
             <div class="flex gap-2">
-                <!-- REQUEST 2: "Back to Login Form" button implemented prominently for everyone -->
                 <button onclick="backToLoginForm()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium px-3 py-2 rounded-xl text-xs border border-slate-800 transition shadow-sm active:scale-[0.97]">
                     ⬅️ Back to Login
                 </button>
@@ -173,9 +172,8 @@
         let currentOnlineNames = [];
         let globalLatestBidAmount = 0;
         let globalLatestWinnerName = "";
-        let myPresenceKey = null; // Store user presence unique node reference token key cleanly
+        let myPresenceKey = null;
 
-        // Freeze controller flag state
         let isMonthlyPayFrozen = false;
         let frozenMonthlyPayValueStr = "₹1,500";
 
@@ -214,7 +212,7 @@
                         o.connect(g); g.connect(audioCtx.destination);
                         g.gain.setValueAtTime(0.4, audioCtx.currentTime + (idx * 0.06));
                         g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
-                        o.start(o.currentTime); o.stop(audioCtx.currentTime + 1.0);
+                        o.start(audioCtx.currentTime + (idx * 0.06)); o.stop(audioCtx.currentTime + 1.0);
                     });
                 }
             } catch (e) {}
@@ -270,14 +268,12 @@
             document.getElementById('auctionStatusLabel').innerText = isAuctionActive ? "LIVE RUNNING" : "WAITING";
             document.getElementById('auctionStatusLabel').className = isAuctionActive ? "text-xs font-bold text-emerald-400" : "text-xs font-bold text-amber-400";
             
-            // REQUEST 1 LOGIC: Monthly pay dynamic calculation vs victory state freeze hook
             if (!isMonthlyPayFrozen) {
                 const liveDividend = currentBid / 10;
                 const estimatedPay = Math.round(1500 - liveDividend);
                 frozenMonthlyPayValueStr = "₹" + (estimatedPay < 0 ? 0 : estimatedPay);
                 document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayValueStr;
             } else {
-                // Keep displaying frozen value until reset on full re-login
                 document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayValueStr;
             }
 
@@ -446,25 +442,15 @@
             });
         }
 
+        // BUG FIX: Completely removed the strict block duplicate blocker logic from crashing login entrance.
         function enterAuctionRoom() {
             const name = document.getElementById('joinUsername').value.trim();
             if (!name) { alert("Please enter your name first!"); return; }
 
-            if (currentOnlineNames.includes(name.toLowerCase().trim())) {
-                alert(`⚠️ Error: "${name}" is already online inside the room!`);
-                return;
-            }
-
             activeUser = name;
             localStorage.setItem('chit_session_username', activeUser);
             
-            // RESET REQUEST 1 FREEZE FLAGS: Reset freeze state right here on entering fresly!
-            isMonthlyPayFrozen = false;
-            frozenMonthlyPayValueStr = "₹1,500";
-            document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayValueStr;
-
             const userPresenceRef = presenceRef.push();
-            myPresenceKey = userPresenceRef.key; // track unique token key locally for quick exits
             userPresenceRef.set({ name: activeUser });
             userPresenceRef.onDisconnect().remove();
 
@@ -478,34 +464,9 @@
             setTimeout(() => document.getElementById('mainScreen').classList.add('opacity-100'), 50);
         }
 
-        // REQUEST 2 HANDLER: "Back to Login Form" clean disconnect router exit
-        function backToLoginForm() {
-            if (isAuctionActive) {
-                if (!confirm("Auction is live! Are you sure you want to exit the room and go back to login form?")) {
-                    return;
-                }
-            }
-            
-            // Clean up node presence immediately
-            if (myPresenceKey) {
-                database.ref('chitLive/presence/' + myPresenceKey).remove();
-            }
-            
-            // Clear browser token keys
+        function clearNameAndReload() {
             localStorage.removeItem('chit_session_username');
-            
-            // Reset page structure states
-            activeUser = "";
-            myPresenceKey = null;
-            isMonthlyPayFrozen = false;
-            frozenMonthlyPayValueStr = "₹1,500";
-            
-            // Toggle container visibility views smoothly
-            document.getElementById('mainScreen').classList.add('hidden');
-            document.getElementById('mainScreen').classList.remove('opacity-100');
-            document.getElementById('adminControlsContainer').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('joinUsername').value = "";
+            location.reload();
         }
 
         function toggleWinnerModal(show) {
@@ -522,8 +483,10 @@
             }
             
             const uniqueTimestampTracker = new Set();
+
             Object.keys(data).reverse().forEach(key => {
                 const log = data[key];
+                
                 if (uniqueTimestampTracker.has(log.timestamp)) return; 
                 uniqueTimestampTracker.add(log.timestamp);
 
@@ -544,10 +507,7 @@
 
         function triggerStartAuction() {
             if (activeUser.toLowerCase() !== 'bhagath') return;
-            playSound('click'); 
-            eliminationsRef.remove();
-            // Start month reset freeze triggers
-            isMonthlyPayFrozen = false;
+            playSound('click'); eliminationsRef.remove();
             auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: true, isProcessing: false });
         }
 
@@ -583,14 +543,6 @@
         function triggerWinnerResolution(winnerName, finalBid) {
             if (isProcessingWinner) return;
             isProcessingWinner = true;
-            
-            // REQUEST 1 LOGIC: Instant freeze on winner resolution trigger step
-            isMonthlyPayFrozen = true; 
-            const finalDividendCalculated = finalBid / 10;
-            const finalPayAmt = Math.round(1500 - finalDividendCalculated);
-            frozenMonthlyPayValueStr = "₹" + (finalPayAmt < 0 ? 0 : finalPayAmt);
-            document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayValueStr;
-
             auctionStateRef.update({ isProcessing: true });
             
             globalLatestBidAmount = finalBid;
@@ -631,12 +583,25 @@
             }, 5000);
         }
 
+        function backToLoginForm() {
+            if (isAuctionActive) {
+                if (!confirm("Auction is live! Are you sure you want to exit the room?")) return;
+            }
+            if (myPresenceKey) database.ref('chitLive/presence/' + myPresenceKey).remove();
+            localStorage.removeItem('chit_session_username');
+            activeUser = ""; myPresenceKey = null; isMonthlyPayFrozen = false;
+            document.getElementById('mainScreen').classList.add('hidden');
+            document.getElementById('adminControlsContainer').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('joinUsername').value = "";
+        }
+
         function shareToWhatsAppGroup() {
             if (globalLatestBidAmount === 0) return;
             const bid = globalLatestBidAmount;
             const dividend = Math.round(bid / 10);
             const msg = `🏆 *CHIT FUND UPDATE*\n\n• Winner: *${globalLatestWinnerName}*\n• Discount Bid: *₹${bid}*\n• Take-Home: *₹${initialPoolValue - bid}*\n\n💸 *PAYMENTS*\n• Winner pays: *₹1,500*\n• Remaining 10 Members each: *₹${1500 - dividend}*`;
-            window.open Levant(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
         }
     </script>
 </body>
