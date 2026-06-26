@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V42 Final Edition</title>
+    <title>Premium 15K Chit Auction - V44 Final Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -13,61 +13,31 @@
         body { font-family: 'Inter', sans-serif; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); }
         
-        /* GAVEL MOTION STRIKE EFFECT */
-        @keyframes gavelPound {
-            0% { transform: rotate(-18deg); }
-            25% { transform: rotate(8deg); }
-            30% { transform: rotate(10deg); }
-            60% { transform: rotate(-18deg); }
-            100% { transform: rotate(-18deg); }
+        /* DYNAMIC LIVE BID RADAR GLOW EFFECTS */
+        @keyframes radarGlow {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
         }
-        .animate-gavel {
-            transform-origin: 130px 65px;
-            animation: gavelPound 1.4s cubic-bezier(0.6, 0, 0.2, 1) infinite;
+        .animate-radar {
+            animation: radarGlow 2s infinite ease-in-out;
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-start p-4 selection:bg-amber-500 selection:text-slate-950">
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-6 transition-all duration-300">
-        <div class="w-full max-w-md glass border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6 text-center">
+    <div id="loginScreen" class="fixed inset-0 z-40 bg-slate-950 flex flex-col items-center justify-center p-6 transition-all duration-300 overflow-y-auto">
+        <div class="w-full max-w-md glass border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6 text-center my-auto">
             
-            <!-- HIGH-FIDELITY CARTOON VECTOR ILLUSTRATION MATCHING USER'S PHOTO -->
-            <div class="w-full max-w-[240px] mx-auto bg-slate-900/40 rounded-2xl border border-slate-800/80 p-2 relative">
-                <svg viewBox="0 0 200 150" class="w-full h-auto drop-shadow-[0_10px_15px_rgba(245,158,11,0.1)]">
-                    <g fill="#f59e0b" opacity="0.8">
-                        <circle cx="45" cy="115" r="3" class="animate-ping" style="animation-duration: 1.4s" />
-                        <circle cx="115" cy="120" r="2.5" />
-                        <path d="M 35 110 L 25 105 L 30 115 Z" />
-                        <path d="M 125 112 L 138 108 L 130 118 Z" />
-                    </g>
-                    <g transform="translate(40, 110)">
-                        <ellipse cx="40" cy="15" rx="38" ry="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
-                        <path d="M 2,15 A 38,12 0 0,0 78,15 L 78,25 A 38,12 0 0,1 2,25 Z" fill="#0f172a" stroke="#334155" stroke-width="2"/>
-                        <ellipse cx="40" cy="15" rx="32" ry="8" fill="#334155"/>
-                    </g>
-                    <g class="animate-gavel">
-                        <g transform="translate(60, 50) rotate(-15)">
-                            <rect x="0" y="0" width="30" height="45" rx="4" fill="#b45309" stroke="#78350f" stroke-width="2"/>
-                            <rect x="-3" y="6" width="36" height="6" fill="#f59e0b"/>
-                            <rect x="-3" y="33" width="36" height="6" fill="#f59e0b"/>
-                            <path d="M 15,22 L 85,32" stroke="#d97706" stroke-width="7" stroke-linecap="round"/>
-                            <path d="M 15,22 L 85,32" stroke="#78350f" stroke-width="7" stroke-linecap="round" opacity="0.3"/>
-                        </g>
-                        <path d="M 130,85 C 122,85 115,80 115,75 C 115,68 125,62 135,62 L 180,50 L 185,78 Z" fill="#ffedd5" stroke="#78350f" stroke-width="2"/>
-                        <g fill="#fde047" stroke="#78350f" stroke-width="1.5">
-                            <rect x="115" y="68" width="10" height="7" rx="3"/>
-                            <rect x="120" y="63" width="10" height="7" rx="3"/>
-                            <rect x="123" y="58" width="10" height="7" rx="3"/>
-                            <rect x="121" y="53" width="10" height="7" rx="3"/>
-                        </g>
-                    </g>
-                </svg>
-                <span class="absolute top-2 right-2 flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
+            <!-- REPLACED WITH A LIVE ACTION RADAR-STYLE PULSING GIF-LIKE BADGE -->
+            <div class="w-24 h-24 mx-auto bg-slate-900 border-2 border-rose-500/50 rounded-full flex flex-col items-center justify-center shadow-2xl shadow-rose-500/10 relative p-2 animate-radar">
+                <span class="text-xl font-black text-rose-500 tracking-tighter flex items-center gap-1">
+                    <span class="inline-block w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
+                    LIVE
                 </span>
+                <span class="text-xs font-bold text-slate-400 tracking-widest mt-0.5">AUCTION</span>
+                <span class="text-lg mt-0.5">🔨</span>
             </div>
             
             <h1 class="text-3xl font-black text-white tracking-tight">CHIT AUCTION PORTAL</h1>
@@ -75,9 +45,55 @@
             
             <div class="space-y-4 pt-2">
                 <input type="text" id="joinUsername" placeholder="Your Name" class="w-full p-4 rounded-xl bg-slate-900/90 border border-slate-700 text-white font-medium focus:outline-none focus:border-amber-500 text-center tracking-wide text-lg transition shadow-inner">
+                
                 <button onclick="enterAuctionRoom()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold py-4 rounded-xl text-lg transition-all shadow-lg shadow-amber-500/20 active:scale-[0.98]">
                     Enter Bidding Room
                 </button>
+
+                <!-- INSTRUCTIONS BUTTON ON STARTING PAGE -->
+                <button onclick="toggleInstructionsModal(true)" class="w-full bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-amber-400 font-semibold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    📋 Instructions & Rules
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INSTRUCTIONS MODAL -->
+    <div id="instructionsModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-md glass border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-5 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">📋 Instructions & Chit Rules</h3>
+                <button onclick="toggleInstructionsModal(false)" class="text-slate-400 hover:text-white font-bold text-xs bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">Close</button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-5 text-xs leading-relaxed text-slate-300">
+                
+                <!-- APP INSTRUCTIONS -->
+                <div class="space-y-2">
+                    <h4 class="text-amber-400 font-bold text-sm uppercase tracking-wider">📱 App Ela Use Cheyyాలి?</h4>
+                    <ul class="list-disc pl-4 space-y-1.5 text-slate-300">
+                        <li><b>Login:</b> Starting page lo మీ పేరు ఎంటర్ చేసి రూమ్‌లోకి వెళ్ళండి.</li>
+                        <li><b>Start Auction:</b> హోస్ట్ స్టార్ట్ కొట్టేంతవరకు లాబీ వెయిటింగ్‌లో ఉంటుంది.</li>
+                        <li><b>Bidding:</b> ఆక్షన్ లైవ్ అయ్యాక, ప్రతీ క్లిక్‌కి బిడ్ (డిస్కౌంట్) <b>₹50</b> పెరుగుతుంది.</li>
+                        <li><b>Mandatory Quit:</b> ఒకవేళ మీకు ఈ రౌండ్ బిడ్ వేయడం వద్దు అనుకుంటే, ఖచ్చితంగా **QUIT FROM BIDDING** బటన్ నొక్కాలి!</li>
+                        <li><b>Quit Status:</b> మీరు క్విట్ కొట్టగానే అందరికీ లైవ్ స్క్రీన్‌పై మీ పేరు పక్కన  గుర్తు రియల్-టైమ్‌లో కనిపిస్తుంది.</li>
+                        <li><b>Auto Win:</b> లాబీలో మిగిలిన వాళ్ళంతా క్విట్ అయిపోయి, ఒక్కరు మాత్రమే లీడ్‌లో ఉంటే వాళ్లే ఆటోమేటిక్‌గా విన్నర్ అవుతారు.</li>
+                    </ul>
+                </div>
+
+                <hr class="border-slate-800">
+
+                <!-- CHIT FUND RULES -->
+                <div class="space-y-2">
+                    <h4 class="text-emerald-400 font-bold text-sm uppercase tracking-wider">💰 ₹15,000 Chit Rules</h4>
+                    <ul class="list-disc pl-4 space-y-1.5 text-slate-300">
+                        <li><b>Total Pool:</b> ₹15,000 చిట్ అమౌంట్. ఇందులో <b>₹500 Organizer ఫీజు</b> ముందే మినహాయించబడుతుంది (Net Pool: ₹14,500).</li>
+                        <li><b>Spin Wheel Lucky Draw:</b> ఒకవేళ ఏ నెలలోనైనా ఎవరూ ఆక్షన్ (Bidding) పాడకపోతే, అందరి పేర్లతో <b>Spin Wheel (Lucky Draw)</b> వేసి గెలిచిన లక్కీ యూజర్‌కి ఆ నెల చిట్ ఇవ్వబడుతుంది!</li>
+                        <li><b>Past Winners Locked:</b> ఒకసారి చిట్ గెలుచుకున్న ప్లేయర్, తదుపరి నెలల ఆక్షన్లలో మళ్ళీ బిడ్ వేయలేరు. వాళ్ళ కంట్రోల్స్ లాక్ అవుతాయి.</li>
+                        <li><b>Take-Home Amount:</b> ఫైనల్ బిడ్ ఎంతైతే ముగుస్తుందో, ఆ అమౌంట్ ₹14,500 లో నుండి తీసివేసి మిగిలిన మొత్తాన్ని విన్నర్ ఇంటికి తీసుకెళ్తారు.</li>
+                        <li><b>Monthly Payment Dividend:</b> గెలిచిన బిడ్ అమౌంట్ 10 మంది సభ్యులకి సమానంగా డివిడెండ్ రూపంలో పంపిణీ అవుతుంది, అందువల్ల ఆ నెల కట్టాల్సిన నెలవారీ అమౌంట్ తగ్గుతుంది.</li>
+                    </ul>
+                </div>
+
             </div>
         </div>
     </div>
@@ -290,7 +306,6 @@
             updateHistoryUI(data);
         });
 
-        // FIXED AND SYNCHRONIZED ELIMINATION LISTENER TRIGGERING REALTIME RED BADGES
         eliminationsRef.on('value', (snapshot) => {
             quitPlayersRoundList = [];
             const data = snapshot.val();
@@ -299,7 +314,6 @@
                     quitPlayersRoundList.push(name.toLowerCase().trim());
                 });
             }
-            // Retrigger presence rendering so live updates show immediately without requiring page refresh
             triggerPresenceUIRender();
             evaluateLiveBiddingLogicState();
             checkAndTriggerAutoWinCondition();
@@ -409,7 +423,11 @@
             triggerPresenceUIRender();
         });
 
-        // DEDICATED PRESENCE RENDERER THAT CRITICALLY APPLIES RED BORDERS AND HIGHLIGHTS ON QUIT
+        function toggleInstructionsModal(show) {
+            const m = document.getElementById('instructionsModal');
+            if (show) m.classList.remove('hidden'); else m.classList.add('hidden');
+        }
+
         function triggerPresenceUIRender() {
             presenceRef.once('value', (snapshot) => {
                 const usersListEl = document.getElementById('activeUsersList');
@@ -451,7 +469,6 @@
                         badge.className = "text-xs bg-slate-900/60 border border-slate-800 text-slate-500 px-3 py-1 rounded-full line-through";
                         badge.innerHTML = `🏅 ${name}`;
                     } else if (isEliminated) {
-                        // FIXED: Absolute solid high-visibility red badge rendering so everyone immediately identifies who hit QUIT
                         badge.className = "text-xs bg-rose-950/80 border-2 border-rose-500 text-rose-400 px-3 py-1 rounded-full font-extrabold shadow-md flex items-center gap-1 animate-pulse shadow-rose-900/30";
                         badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-0.5"></span> 🔴 ${name} (Quit)`;
                     } else {
