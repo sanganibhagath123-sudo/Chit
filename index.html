@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V31 Complete Fixed</title>
+    <title>Premium 15K Chit Auction - V33 Lead Lock</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -297,34 +297,45 @@
 
                 if (isAuctionActive) {
                     if (isUserAlreadyWinner) {
-                        setButtonLockedState(bidBtn, quitBtn, "CONTROLS LOCKED (PAST WINNER)");
+                        setButtonLockedState(bidBtn, quitBtn, "CONTROLS LOCKED (PAST WINNER)", true);
                     } else {
                         const hasUserQuit = quitPlayersRoundList.includes(activeUser.toLowerCase().trim());
                         if (hasUserQuit) {
-                            setButtonLockedState(bidBtn, quitBtn, "YOU QUIT THIS ROUND");
+                            setButtonLockedState(bidBtn, quitBtn, "YOU QUIT THIS ROUND", true);
                         } else if (currentLeader.toLowerCase().trim() === activeUser.toLowerCase().trim()) {
+                            // CRITICAL RE-ENGINEER LOCK FOR THE ACTIVE LEADING BIDDER (V33)
                             bidBtn.innerText = "⭐ YOU ARE LEADING (HOLD)"; bidBtn.disabled = true;
                             bidBtn.className = "w-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-black py-5 rounded-2xl text-xl cursor-not-allowed text-center";
-                            quitBtn.disabled = false;
-                            quitBtn.className = "w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
+                            
+                            // DISABLING QUIT BUTTON EXPLICITLY SO THE CURRENT LEADER CANNOT LEAVE THE ROUND
+                            quitBtn.innerText = "🔒 LOCKED (YOU ARE LEADING)"; quitBtn.disabled = true;
+                            quitBtn.className = "w-full bg-slate-900 border border-slate-800 text-slate-600 font-bold py-4 rounded-xl text-sm cursor-not-allowed text-center transition";
                         } else {
                             bidBtn.innerText = (currentLeader === "None Yet" || currentBid === 0) ? "BID STARTING ₹100" : "RAISE BID (+₹50)";
                             bidBtn.className = "w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black py-5 rounded-2xl text-xl active:scale-[0.97]";
                             bidBtn.disabled = false;
-                            quitBtn.disabled = false;
-                            quitBtn.className = "w-full bg-rose-600/20 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
+                            
+                            quitBtn.innerText = "❌ QUIT FROM BIDDING"; quitBtn.disabled = false;
+                            quitBtn.className = "w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
                         }
                     }
                 } else {
-                    setButtonLockedState(bidBtn, quitBtn, "HOLD LOBBY (WAIT FOR BHAGATH TO START)");
+                    setButtonLockedState(bidBtn, quitBtn, "HOLD LOBBY (WAIT FOR BHAGATH TO START)", false);
                 }
             });
         }
 
-        function setButtonLockedState(bidBtn, quitBtn, label) {
+        function setButtonLockedState(bidBtn, quitBtn, label, forceQuitDisable) {
             bidBtn.innerText = label; bidBtn.disabled = true;
             bidBtn.className = "w-full bg-slate-900 border border-slate-800 text-slate-600 font-black py-5 rounded-2xl text-xl cursor-not-allowed text-center text-xs";
-            quitBtn.disabled = true; quitBtn.className = "w-full bg-slate-900 border border-slate-800 text-slate-700 font-bold py-4 rounded-xl text-sm cursor-not-allowed text-center";
+            
+            if(forceQuitDisable) {
+               quitBtn.innerText = "❌ QUIT FROM BIDDING"; quitBtn.disabled = true;
+               quitBtn.className = "w-full bg-slate-900 border border-slate-800 text-slate-700 font-bold py-4 rounded-xl text-sm cursor-not-allowed text-center";
+            } else {
+               quitBtn.innerText = "QUIT FROM BIDDING"; quitBtn.disabled = true;
+               quitBtn.className = "w-full bg-slate-900 border border-slate-800 text-slate-700 font-bold py-4 rounded-xl text-sm cursor-not-allowed text-center";
+            }
         }
 
         function checkWinnerRestrictionStatus() {
@@ -458,23 +469,23 @@
             if (show) m.classList.remove('hidden'); else m.classList.add('hidden');
         }
 
-        // 100% FIXED STRICTOR RE-RENDER SCRUBBER
         function updateHistoryUI(data) {
             const container = document.getElementById('historyLogs');
-            container.innerHTML = ""; // Scrub it completely clean
+            container.innerHTML = "";
             if (!data) {
                 container.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-4">No winners recorded yet.</p>`;
                 return;
             }
             
-            // Clean local object mapping to fully eliminate visual mirroring bugs on sync fires
-            const pristineMap = {};
-            Object.keys(data).forEach(key => {
-                pristineMap[key] = data[key];
-            });
+            const uniqueTimestampTracker = new Set();
 
-            Object.keys(pristineMap).reverse().forEach(key => {
-                const log = pristineMap[key];
+            Object.keys(data).reverse().forEach(key => {
+                const log = data[key];
+                if (uniqueTimestampTracker.has(log.timestamp)) {
+                    return; 
+                }
+                uniqueTimestampTracker.add(log.timestamp);
+
                 const card = document.createElement('div');
                 card.className = "bg-slate-900/90 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between text-xs shadow-sm mb-2";
                 card.innerHTML = `
@@ -512,15 +523,24 @@
 
         function triggerQuit() {
             if (!isAuctionActive || isUserAlreadyWinner) return;
-            if (confirm("Are you sure you want to quit from bidding this round?")) {
-                playSound('quit'); eliminationsRef.push(activeUser);
-            }
+            
+            // ADDITIONAL GUARD TO ABSOLUTELY REJECT QUIT ACTION IF LEADING
+            auctionStateRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                const currentLeader = data ? (data.highestBidder || "None Yet") : "None Yet";
+                if (currentLeader.toLowerCase().trim() === activeUser.toLowerCase().trim()) {
+                    alert("🔒 Error: Bidding lo nuvve lead lo unnav bro! Nuvvu quit kottadaniki వీల్లేదు!");
+                    return;
+                }
+                if (confirm("Are you sure you want to quit from bidding this round?")) {
+                    playSound('quit'); eliminationsRef.push(activeUser);
+                }
+            });
         }
 
         function triggerWinnerResolution(winnerName, finalBid) {
             if (isProcessingWinner) return;
             isProcessingWinner = true;
-            
             auctionStateRef.update({ isProcessing: true });
             
             globalLatestBidAmount = finalBid;
@@ -548,7 +568,6 @@
                 timestamp: dateString
             };
 
-            // STRICT SINGLE REFERENCE PUSH CONSTRAINT
             if (activeUser.toLowerCase().trim() === winnerName.toLowerCase().trim()) {
                 auctionHistoryRef.push(roundDataToken);
             }
