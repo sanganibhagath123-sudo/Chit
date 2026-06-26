@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V22 Final Profit Edition</title>
+    <title>Premium 15K Chit Auction - V23 Instant Flow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -55,10 +55,8 @@
                 </button>
             </header>
 
-            <!-- Financial Summary Cards Grid -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="glass border border-slate-800 p-4 rounded-2xl text-center">
-                    <!-- UPDATED: Replaced Total Paid with Total Profit Saved -->
                     <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">Total Profit (మొత్తం లాభం)</span>
                     <span id="ledgerTotalProfit" class="text-xl font-extrabold text-emerald-400">₹0</span>
                 </div>
@@ -68,7 +66,6 @@
                 </div>
             </div>
 
-            <!-- Passbook History Feed -->
             <div class="glass border border-slate-800 rounded-2xl p-5 space-y-4">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800/60 pb-2">📜 Round-Wise Statement</h3>
                 <div id="ledgerStatementContainer" class="space-y-3 max-h-[50vh] overflow-y-auto"></div>
@@ -95,7 +92,6 @@
             </div>
         </header>
 
-        <!-- Winner Alert Banner Popup Overlay -->
         <div id="winnerAlertBanner" class="hidden bg-gradient-to-r from-emerald-500 to-teal-600 border border-emerald-400/30 text-slate-950 font-bold p-4 rounded-2xl text-center shadow-lg text-sm">
             🎉 <span id="winnerBannerText">Winner Announced!</span>
         </div>
@@ -128,7 +124,6 @@
                 </div>
             </div>
 
-            <!-- Prices Grid -->
             <div class="p-6 grid grid-cols-2 gap-4 border-b border-slate-800/50">
                 <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800/60 text-center">
                     <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider block mb-1">Current Bid (Discount)</span>
@@ -140,13 +135,11 @@
                 </div>
             </div>
 
-            <!-- Live Estimated Monthly Pay Display -->
             <div class="p-4 bg-amber-500/5 border-b border-slate-800/50 px-6 flex items-center justify-between text-xs">
                 <span class="text-amber-400 font-semibold tracking-wide">Estimated Monthly Pay (For 9 Members):</span>
                 <span id="liveMonthlyPayDisplay" class="font-extrabold text-amber-400 text-sm bg-amber-500/10 px-3 py-1 rounded-lg border">₹1,500</span>
             </div>
 
-            <!-- Current Leader Row -->
             <div class="p-4 bg-slate-900/30 px-6 flex items-center justify-between text-sm">
                 <span class="text-slate-400 font-medium">Highest Bidder (Leader):</span>
                 <span id="highestBidder" class="font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 max-w-[180px] truncate">None Yet</span>
@@ -157,23 +150,22 @@
         <div class="space-y-3">
             <div id="adminControlsContainer" class="hidden space-y-2">
                 <div class="grid grid-cols-2 gap-2">
-                    <button id="startAuctionBtn" onclick="triggerStartAuction()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-md active:scale-[0.98]">
+                    <button id="startAuctionBtn" onclick="triggerStartAuction()" class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-md w-full">
                         🚀 START AUCTION
                     </button>
-                    <button id="emergencyCloseBtn" onclick="triggerEmergencyClose()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold py-3.5 rounded-xl text-sm border border-rose-600 transition active:scale-[0.98]">
+                    <button id="emergencyCloseBtn" onclick="triggerEmergencyClose()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold py-3.5 rounded-xl text-sm border border-rose-600 transition">
                         🚨 EMERGENCY CLOSE
                     </button>
                 </div>
-                <button id="whatsappShareBtn" onclick="shareToWhatsAppGroup()" class="hidden w-full bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-700 hover:to-green-600 text-white font-extrabold py-3 rounded-xl text-xs transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 border border-emerald-400/20">
+                <button id="whatsappShareBtn" onclick="shareToWhatsAppGroup()" class="hidden w-full bg-gradient-to-r from-emerald-600 to-green-500 text-white font-extrabold py-3 rounded-xl text-xs transition-all flex items-center justify-center gap-2 border border-emerald-400/20">
                     🟢 SHARE SPLITS TO WHATSAPP
                 </button>
             </div>
 
-            <!-- Bidding Action Triggers -->
-            <button id="raiseBidBtn" onclick="placeBid()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black py-5 rounded-2xl text-xl active:scale-[0.97] disabled:bg-slate-900 disabled:text-slate-600 text-center transition-all">
+            <button id="raiseBidBtn" onclick="placeBid()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black py-5 rounded-2xl text-xl transition-all">
                 BID LOCKED (WAIT FOR START)
             </button>
-            <button id="quitAuctionBtn" onclick="triggerQuit()" class="w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition disabled:bg-slate-900 disabled:text-slate-700 text-center">
+            <button id="quitAuctionBtn" onclick="triggerQuit()" class="w-full bg-rose-600/20 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition text-center">
                 ❌ QUIT FROM BIDDING
             </button>
         </div>
@@ -219,6 +211,7 @@
         let isUserAlreadyWinner = false;
         let pastWinnersList = [];
         let quitPlayersRoundList = [];
+        let currentOnlineNames = []; // Keep track of current names online to block duplicates
         let rawHistorySnapshot = null;
         let globalLatestBidAmount = 0;
         let globalLatestWinnerName = "";
@@ -284,6 +277,10 @@
                     quitPlayersRoundList.push(name.toLowerCase().trim());
                 });
             }
+            // Trigger refresh on state rules if we are already inside the main room
+            if (activeUser) {
+                evaluateLiveBiddingLogicState();
+            }
         });
 
         auctionStateRef.on('value', (snapshot) => {
@@ -312,50 +309,60 @@
             const estimatedPay = Math.round(1500 - liveDividend);
             document.getElementById('liveMonthlyPayDisplay').innerText = "₹" + (estimatedPay < 0 ? 0 : estimatedPay);
 
-            const startBtn = document.getElementById('startAuctionBtn');
-            const bidBtn = document.getElementById('raiseBidBtn');
-            const quitBtn = document.getElementById('quitAuctionBtn');
-            const shareBtn = document.getElementById('whatsappShareBtn');
+            evaluateLiveBiddingLogicState();
+        });
 
-            if (startBtn) {
-                if (isAuctionActive) {
-                    startBtn.innerText = "🚨 LIVE NOW"; startBtn.disabled = true;
-                    startBtn.className = "bg-slate-800 text-slate-500 font-bold py-3.5 rounded-xl text-sm cursor-not-allowed text-center w-full";
-                } else {
-                    startBtn.innerText = "🚀 START AUCTION"; startBtn.disabled = false;
-                    startBtn.className = "bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-md active:scale-[0.98] w-full";
-                }
-            }
+        function evaluateLiveBiddingLogicState() {
+            auctionStateRef.once('value', (snap) => {
+                const data = snap.val();
+                const currentBid = data ? (data.highestBid || 0) : 0;
+                const currentLeader = data ? data.highestBidder : "None Yet";
 
-            if (shareBtn && activeUser.toLowerCase() === 'bhagath') {
-                if (!isAuctionActive && globalLatestBidAmount > 0) shareBtn.classList.remove('hidden');
-                else shareBtn.classList.add('hidden');
-            }
+                const startBtn = document.getElementById('startAuctionBtn');
+                const bidBtn = document.getElementById('raiseBidBtn');
+                const quitBtn = document.getElementById('quitAuctionBtn');
+                const shareBtn = document.getElementById('whatsappShareBtn');
 
-            if (isAuctionActive) {
-                if (isUserAlreadyWinner) {
-                    setButtonLockedState(bidBtn, quitBtn, "CONTROLS LOCKED (PAST WINNER)");
-                } else {
-                    const hasUserQuit = quitPlayersRoundList.includes(activeUser.toLowerCase().trim());
-                    if (hasUserQuit) {
-                        setButtonLockedState(bidBtn, quitBtn, "YOU QUIT THIS ROUND");
-                    } else if (currentLeader.toLowerCase().trim() === activeUser.toLowerCase().trim()) {
-                        bidBtn.innerText = "⭐ YOU ARE LEADING (HOLD)"; bidBtn.disabled = true;
-                        bidBtn.className = "w-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-black py-5 rounded-2xl text-xl cursor-not-allowed text-center";
-                        quitBtn.disabled = false;
-                        quitBtn.className = "w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
+                if (startBtn) {
+                    if (isAuctionActive) {
+                        startBtn.innerText = "🚨 LIVE NOW"; startBtn.disabled = true;
+                        startBtn.className = "bg-slate-800 text-slate-500 font-bold py-3.5 rounded-xl text-sm cursor-not-allowed text-center w-full";
                     } else {
-                        bidBtn.innerText = (currentLeader === "None Yet" || currentBid === 0) ? "BID STARTING ₹100" : "RAISE BID (+₹50)";
-                        bidBtn.className = "w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black py-5 rounded-2xl text-xl active:scale-[0.97]";
-                        bidBtn.disabled = false;
-                        quitBtn.disabled = false;
-                        quitBtn.className = "w-full bg-rose-600/20 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
+                        startBtn.innerText = "🚀 START AUCTION"; startBtn.disabled = false;
+                        startBtn.className = "bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-md w-full";
                     }
                 }
-            } else {
-                setButtonLockedState(bidBtn, quitBtn, "BID LOCKED (WAIT FOR START)");
-            }
-        });
+
+                if (shareBtn && activeUser.toLowerCase() === 'bhagath') {
+                    if (!isAuctionActive && globalLatestBidAmount > 0) shareBtn.classList.remove('hidden');
+                    else shareBtn.classList.add('hidden');
+                }
+
+                if (isAuctionActive) {
+                    if (isUserAlreadyWinner) {
+                        setButtonLockedState(bidBtn, quitBtn, "CONTROLS LOCKED (PAST WINNER)");
+                    } else {
+                        const hasUserQuit = quitPlayersRoundList.includes(activeUser.toLowerCase().trim());
+                        if (hasUserQuit) {
+                            setButtonLockedState(bidBtn, quitBtn, "YOU QUIT THIS ROUND");
+                        } else if (currentLeader.toLowerCase().trim() === activeUser.toLowerCase().trim()) {
+                            bidBtn.innerText = "⭐ YOU ARE LEADING (HOLD)"; bidBtn.disabled = true;
+                            bidBtn.className = "w-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-black py-5 rounded-2xl text-xl cursor-not-allowed text-center";
+                            quitBtn.disabled = false;
+                            quitBtn.className = "w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
+                        } else {
+                            bidBtn.innerText = (currentLeader === "None Yet" || currentBid === 0) ? "BID STARTING ₹100" : "RAISE BID (+₹50)";
+                            bidBtn.className = "w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black py-5 rounded-2xl text-xl active:scale-[0.97]";
+                            bidBtn.disabled = false;
+                            quitBtn.disabled = false;
+                            quitBtn.className = "w-full bg-rose-600/20 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
+                        }
+                    }
+                } else {
+                    setButtonLockedState(bidBtn, quitBtn, "BID LOCKED (WAIT FOR START)");
+                }
+            });
+        }
 
         function setButtonLockedState(bidBtn, quitBtn, label) {
             bidBtn.innerText = label; bidBtn.disabled = true;
@@ -373,9 +380,79 @@
             }
         }
 
+        // Presence listener tracking room online count and blocking duplicate entries
+        presenceRef.on('value', (snapshot) => {
+            const usersListEl = document.getElementById('activeUsersList');
+            const countEl = document.getElementById('onlineCount');
+            const data = snapshot.val();
+            
+            currentOnlineNames = [];
+            if (!data) { countEl.innerText = "0 Online"; return; }
+            
+            usersListEl.innerHTML = "";
+            const compactUsers = {};
+            Object.values(data).forEach(u => {
+                const normalized = u.name.toLowerCase().trim();
+                compactUsers[normalized] = u.name;
+                currentOnlineNames.push(normalized);
+            });
+            countEl.innerText = Object.keys(compactUsers).length + " Online";
+
+            let totalJoinedBiddersCount = 0;
+            let totalQuitBiddersCount = 0;
+            let currentWinnerCandidate = "None Yet";
+
+            // Track active remaining players safely
+            Object.values(compactUsers).forEach(name => {
+                const nameLower = name.toLowerCase().trim();
+                const isEliminated = quitPlayersRoundList.includes(nameLower);
+                const isWinnerPast = pastWinnersList.includes(nameLower);
+                
+                if (!isWinnerPast) {
+                    totalJoinedBiddersCount++;
+                    if (isEliminated) {
+                        totalQuitBiddersCount++;
+                    } else {
+                        currentWinnerCandidate = name; // Last remaining active candidate standing
+                    }
+                }
+
+                const badge = document.createElement('span');
+                if (isWinnerPast) {
+                    badge.className = "text-xs bg-slate-900/60 border border-slate-800 text-slate-500 px-3 py-1 rounded-full line-through";
+                    badge.innerHTML = `🏅 ${name}`;
+                } else if (isEliminated) {
+                    badge.className = "text-xs bg-rose-950/20 border border-rose-900/30 text-rose-500 px-3 py-1 rounded-full";
+                    badge.innerHTML = `❌ ${name} (Quit)`;
+                } else {
+                    badge.className = "text-xs bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1 rounded-full flex items-center gap-1";
+                    badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${name}`;
+                }
+                usersListEl.appendChild(badge);
+            });
+
+            // INSTANT WIN LOGIC: Whenever any member hits "Quit From Bidding", if everyone except 1 player has quit, that 1 player wins instantly!
+            if (isAuctionActive && !isProcessingWinner && totalJoinedBiddersCount > 1) {
+                if (totalQuitBiddersCount === (totalJoinedBiddersCount - 1) && currentWinnerCandidate !== "None Yet") {
+                    auctionStateRef.once('value', (stateSnap) => {
+                        const s = stateSnap.val();
+                        const finalBidAmt = s ? (s.highestBid || 0) : 0;
+                        // Resolve instantly
+                        triggerWinnerResolution(currentWinnerCandidate, finalBidAmt);
+                    });
+                }
+            }
+        });
+
         function handlePortalEntry(targetMode) {
             const name = document.getElementById('joinUsername').value.trim();
             if (!name) { alert("Please enter your name first!"); return; }
+
+            // CRITICAL DUPLICATE NAME PROTECTION BLOCKER
+            if (currentOnlineNames.includes(name.toLowerCase().trim())) {
+                alert(`⚠️ Error: "${name}" is already online inside the room! Choose another name or add a surname.`);
+                return;
+            }
 
             if (targetMode === 'bidding') {
                 if (!isAuctionActive && name.toLowerCase() !== 'bhagath') {
@@ -403,14 +480,12 @@
             }
         }
 
-        // FIXED CRITICAL NESTED MATH LOOP: Compute real dynamic profit passbook metrics cleanly
         function renderPersonalPassbook(playerName) {
             const searchName = playerName.toLowerCase().trim();
             document.getElementById('ledgerOwnerTitle').innerText = playerName + "'s Passbook";
             const container = document.getElementById('ledgerStatementContainer');
             container.innerHTML = "";
             
-            let totalDividendSavedAccumulator = 0; // Tracks the total cash savings gained via friend discounts
             let totalInvestedAccumulator = 0;
             let holdsChitFlag = false;
             let statementsFound = 0;
@@ -433,7 +508,7 @@
                     } else {
                         computedCharge = 1500 - roundDiv;
                         if (computedCharge < 0) computedCharge = 0;
-                        totalInvestedAccumulator += roundDiv; // Track profit accumulation cleanly
+                        totalInvestedAccumulator += roundDiv;
                         typeLabel = `💸 Dividend Contribution (Round ${roundNum})`;
                         rowColor = "border-slate-800 bg-slate-900/40";
                     }
@@ -458,8 +533,7 @@
                 container.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-6">No records found yet.</p>`;
             }
             
-            // Render simplified readable total parameters as requested by the user
-            document.getElementById('ledgerTotalPaid').innerText = "₹" + totalInvestedAccumulator.toLocaleString('en-IN') + " Total Saved: ₹" + totalInvestedAccumulator;
+            document.getElementById('ledgerTotalProfit').innerText = "₹" + totalInvestedAccumulator.toLocaleString('en-IN');
             document.getElementById('ledgerChitStatus').innerText = holdsChitFlag ? "🏆 Yes" : "❌ No";
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('personalLedgerScreen').classList.remove('hidden');
@@ -523,10 +597,13 @@
             });
         }
 
+        // INSTANT QUIT TRIGGER ENGINE
         function triggerQuit() {
             if (!isAuctionActive || isUserAlreadyWinner) return;
             if (confirm("Are you sure you want to quit from bidding this round?")) {
-                playSound('quit'); eliminationsRef.push(activeUser);
+                playSound('quit'); 
+                // Push data to Firebase instantly
+                eliminationsRef.push(activeUser);
             }
         }
 
@@ -540,87 +617,6 @@
                     eliminationsRef.remove();
                 }, 1000);
             }
-        }
-
-        presenceRef.on('value', (snapshot) => {
-            const usersListEl = document.getElementById('activeUsersList');
-            const countEl = document.getElementById('onlineCount');
-            const data = snapshot.val();
-            if (!data) { countEl.innerText = "0 Online"; return; }
-            
-            usersListEl.innerHTML = "";
-            const compactUsers = {};
-            Object.values(data).forEach(u => compactUsers[u.name.toLowerCase().trim()] = u.name);
-            countEl.innerText = Object.keys(compactUsers).length + " Online";
-
-            let activeCount = 0;
-            Object.values(compactUsers).forEach(name => {
-                const nameLower = name.toLowerCase().trim();
-                const isEliminated = quitPlayersRoundList.includes(nameLower);
-                const isWinnerPast = pastWinnersList.includes(nameLower);
-                if (!isEliminated && !isWinnerPast) activeCount++;
-
-                const badge = document.createElement('span');
-                if (isWinnerPast) {
-                    badge.className = "text-xs bg-slate-900/60 border border-slate-800 text-slate-500 px-3 py-1 rounded-full line-through";
-                    badge.innerHTML = `🏅 ${name}`;
-                } else if (isEliminated) {
-                    badge.className = "text-xs bg-rose-950/20 border border-rose-900/30 text-rose-500 px-3 py-1 rounded-full";
-                    badge.innerHTML = `❌ ${name} (Quit)`;
-                } else {
-                    badge.className = "text-xs bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1 rounded-full flex items-center gap-1";
-                    badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${name}`;
-                }
-                usersListEl.appendChild(badge);
-            });
-
-            if (isAuctionActive && !isProcessingWinner && Object.keys(compactUsers).length > 1) {
-                auctionStateRef.once('value', (stateSnap) => {
-                    const s = stateSnap.val();
-                    if (s && s.highestBidder !== "None Yet") {
-                        if (activeCount === 1) {
-                            triggerWinnerResolution(s.highestBidder, s.highestBid);
-                        }
-                    }
-                });
-            }
-        });
-
-        function triggerWinnerResolution(winnerName, finalBid) {
-            isProcessingWinner = true;
-            auctionStateRef.update({ isProcessing: true });
-            globalLatestBidAmount = finalBid;
-            globalLatestWinnerName = winnerName;
-            const takeHomeAmt = initialPoolValue - finalBid;
-            const finalStringDisplay = `₹${takeHomeAmt} won`;
-            
-            playSound('winner');
-            confetti({ particleCount: 120, spread: 70 });
-
-            const banner = document.getElementById('winnerAlertBanner');
-            if (banner) {
-                banner.querySelector('span').innerHTML = `🏆 <b>${winnerName} won</b> — <b>${finalStringDisplay}</b>`;
-                banner.classList.remove('hidden');
-            }
-
-            const d = new Date();
-            const dateString = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) + ' ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-
-            setTimeout(() => {
-                auctionHistoryRef.push({ winner: winnerName, finalBid: finalBid, takeHome: takeHomeAmt, takeHomeDisplayStr: finalStringDisplay, timestamp: dateString }).then(() => {
-                    if (banner) banner.classList.add('hidden');
-                    eliminationsRef.remove();
-                    auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: false, isProcessing: false });
-                });
-            }, 6000);
-        }
-
-        function shareToWhatsAppGroup() {
-            if (globalLatestBidAmount === 0) return;
-            const bid = globalLatestBidAmount;
-            const dividend = Math.round(bid / 9);
-            const msg = `🏆 *CHIT FUND UPDATE*\n\n• Winner: *${globalLatestWinnerName}*\n• Discount Bid: *₹${bid}*\n• Take-Home: *₹${initialPoolValue - bid}*\n\n💸 *PAYMENTS*\n• Winner pays: *₹1,500*\n• Remaining 9 Members each: *₹${1500 - dividend}*`;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
         }
     </script>
 </body>
