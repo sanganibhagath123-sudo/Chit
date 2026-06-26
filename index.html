@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V20 Ultimate Control</title>
+    <title>Premium 15K Chit Auction - V22 Final Profit Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -55,17 +55,20 @@
                 </button>
             </header>
 
+            <!-- Financial Summary Cards Grid -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="glass border border-slate-800 p-4 rounded-2xl text-center">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Total Paid</span>
-                    <span id="ledgerTotalPaid" class="text-xl font-extrabold text-white">₹0</span>
+                    <!-- UPDATED: Replaced Total Paid with Total Profit Saved -->
+                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">Total Profit (మొత్తం లాభం)</span>
+                    <span id="ledgerTotalProfit" class="text-xl font-extrabold text-emerald-400">₹0</span>
                 </div>
                 <div class="glass border border-slate-800 p-4 rounded-2xl text-center">
-                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">Chit Status</span>
-                    <span id="ledgerChitStatus" class="text-sm font-bold text-emerald-400 mt-1 block">Not Yet</span>
+                    <span class="text-[10px] font-bold text-amber-500 uppercase tracking-wider block mb-1">Chit Status (చిట్ పడిందా)</span>
+                    <span id="ledgerChitStatus" class="text-sm font-bold text-white mt-1 block">Not Yet</span>
                 </div>
             </div>
 
+            <!-- Passbook History Feed -->
             <div class="glass border border-slate-800 rounded-2xl p-5 space-y-4">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800/60 pb-2">📜 Round-Wise Statement</h3>
                 <div id="ledgerStatementContainer" class="space-y-3 max-h-[50vh] overflow-y-auto"></div>
@@ -92,7 +95,7 @@
             </div>
         </header>
 
-        <!-- Winner Alert Banner Grid Popup Display Overlay -->
+        <!-- Winner Alert Banner Popup Overlay -->
         <div id="winnerAlertBanner" class="hidden bg-gradient-to-r from-emerald-500 to-teal-600 border border-emerald-400/30 text-slate-950 font-bold p-4 rounded-2xl text-center shadow-lg text-sm">
             🎉 <span id="winnerBannerText">Winner Announced!</span>
         </div>
@@ -137,11 +140,13 @@
                 </div>
             </div>
 
+            <!-- Live Estimated Monthly Pay Display -->
             <div class="p-4 bg-amber-500/5 border-b border-slate-800/50 px-6 flex items-center justify-between text-xs">
                 <span class="text-amber-400 font-semibold tracking-wide">Estimated Monthly Pay (For 9 Members):</span>
                 <span id="liveMonthlyPayDisplay" class="font-extrabold text-amber-400 text-sm bg-amber-500/10 px-3 py-1 rounded-lg border">₹1,500</span>
             </div>
 
+            <!-- Current Leader Row -->
             <div class="p-4 bg-slate-900/30 px-6 flex items-center justify-between text-sm">
                 <span class="text-slate-400 font-medium">Highest Bidder (Leader):</span>
                 <span id="highestBidder" class="font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 max-w-[180px] truncate">None Yet</span>
@@ -150,22 +155,26 @@
 
         <!-- Controls Action Panel -->
         <div class="space-y-3">
-            <div id="adminControlsContainer" class="hidden space-y-3">
-                <button id="startAuctionBtn" onclick="triggerStartAuction()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold py-4 rounded-2xl text-lg transition-all shadow-lg active:scale-[0.98]">
-                    🚀 START AUCTION
-                </button>
-                <button id="whatsappShareBtn" onclick="shareToWhatsAppGroup()" class="hidden w-full bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-700 hover:to-green-600 text-white font-extrabold py-3.5 rounded-2xl text-sm transition-all shadow-md active:scale-[0.98] tracking-wide flex items-center justify-center gap-2 border border-emerald-400/20">
+            <div id="adminControlsContainer" class="hidden space-y-2">
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="startAuctionBtn" onclick="triggerStartAuction()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-md active:scale-[0.98]">
+                        🚀 START AUCTION
+                    </button>
+                    <button id="emergencyCloseBtn" onclick="triggerEmergencyClose()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold py-3.5 rounded-xl text-sm border border-rose-600 transition active:scale-[0.98]">
+                        🚨 EMERGENCY CLOSE
+                    </button>
+                </div>
+                <button id="whatsappShareBtn" onclick="shareToWhatsAppGroup()" class="hidden w-full bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-700 hover:to-green-600 text-white font-extrabold py-3 rounded-xl text-xs transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 border border-emerald-400/20">
                     🟢 SHARE SPLITS TO WHATSAPP
                 </button>
             </div>
 
+            <!-- Bidding Action Triggers -->
             <button id="raiseBidBtn" onclick="placeBid()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black py-5 rounded-2xl text-xl active:scale-[0.97] disabled:bg-slate-900 disabled:text-slate-600 text-center transition-all">
                 BID LOCKED (WAIT FOR START)
             </button>
-            
-            <!-- Quit Button with custom Bhagath emergency hook logic handler -->
-            <button id="quitAuctionBtn" onclick="triggerQuit()" class="w-full bg-rose-600/20 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition disabled:bg-slate-900 disabled:text-slate-700 text-center">
-                QUIT FROM BIDDING / END ROUND
+            <button id="quitAuctionBtn" onclick="triggerQuit()" class="w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition disabled:bg-slate-900 disabled:text-slate-700 text-center">
+                ❌ QUIT FROM BIDDING
             </button>
         </div>
     </div>
@@ -216,6 +225,14 @@
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+        window.addEventListener('beforeunload', (e) => {
+            if (activeUser && isAuctionActive) {
+                e.preventDefault();
+                e.returnValue = "Are you sure you want to exit?";
+                return "Are you sure you want to exit?";
+            }
+        });
+
         function playSound(type) {
             try {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -247,24 +264,6 @@
             } catch (e) {}
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('chit_session_username');
-            if (savedUser) {
-                setTimeout(() => {
-                    if (!isAuctionActive && savedUser.toLowerCase() !== 'bhagath') {
-                        localStorage.removeItem('chit_session_username');
-                        return;
-                    }
-                    if (confirm("You have an active round session as '" + savedUser + "'. Do you want to continue your live auction round?")) {
-                        document.getElementById('joinUsername').value = savedUser;
-                        enterAuctionRoom();
-                    } else {
-                        localStorage.removeItem('chit_session_username');
-                    }
-                }, 1000);
-            }
-        });
-
         auctionHistoryRef.on('value', (snapshot) => {
             rawHistorySnapshot = snapshot.val();
             pastWinnersList = [];
@@ -285,15 +284,13 @@
                     quitPlayersRoundList.push(name.toLowerCase().trim());
                 });
             }
-            if(activeUser) presenceRef.trigger('value');
         });
 
         auctionStateRef.on('value', (snapshot) => {
             const data = snapshot.val();
             
-            // CRITICAL UPDATE: If Bhagath triggered an emergency close, force everyone back to login screen!
             if (data && data.forceQuitTriggered === true) {
-                alert("Bhagath has closed the round session! Ending auction for everyone instantly.");
+                alert("Bhagath has closed the round session! Kicking out to portal home.");
                 localStorage.removeItem('chit_session_username');
                 location.reload();
                 return;
@@ -322,11 +319,11 @@
 
             if (startBtn) {
                 if (isAuctionActive) {
-                    startBtn.innerText = "🚨 AUCTION IN PROGRESS"; startBtn.disabled = true;
-                    startBtn.className = "w-full bg-slate-800 text-slate-500 font-extrabold py-4 rounded-2xl text-lg cursor-not-allowed tracking-wide text-center";
+                    startBtn.innerText = "🚨 LIVE NOW"; startBtn.disabled = true;
+                    startBtn.className = "bg-slate-800 text-slate-500 font-bold py-3.5 rounded-xl text-sm cursor-not-allowed text-center w-full";
                 } else {
                     startBtn.innerText = "🚀 START AUCTION"; startBtn.disabled = false;
-                    startBtn.className = "w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold py-4 rounded-2xl text-lg transition-all shadow-lg active:scale-[0.98]";
+                    startBtn.className = "bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-md active:scale-[0.98] w-full";
                 }
             }
 
@@ -346,14 +343,12 @@
                         bidBtn.innerText = "⭐ YOU ARE LEADING (HOLD)"; bidBtn.disabled = true;
                         bidBtn.className = "w-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 font-black py-5 rounded-2xl text-xl cursor-not-allowed text-center";
                         quitBtn.disabled = false;
-                        quitBtn.innerText = activeUser.toLowerCase() === 'bhagath' ? "🚨 EMERGENCY END ROUND" : "❌ QUIT FROM BIDDING";
-                        quitBtn.className = "w-full bg-rose-600/20 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
+                        quitBtn.className = "w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
                     } else {
                         bidBtn.innerText = (currentLeader === "None Yet" || currentBid === 0) ? "BID STARTING ₹100" : "RAISE BID (+₹50)";
                         bidBtn.className = "w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black py-5 rounded-2xl text-xl active:scale-[0.97]";
                         bidBtn.disabled = false;
                         quitBtn.disabled = false;
-                        quitBtn.innerText = activeUser.toLowerCase() === 'bhagath' ? "🚨 EMERGENCY END ROUND" : "❌ QUIT FROM BIDDING";
                         quitBtn.className = "w-full bg-rose-600/20 text-rose-400 font-bold py-4 rounded-xl text-sm border border-rose-500/20 transition";
                     }
                 }
@@ -408,11 +403,14 @@
             }
         }
 
+        // FIXED CRITICAL NESTED MATH LOOP: Compute real dynamic profit passbook metrics cleanly
         function renderPersonalPassbook(playerName) {
             const searchName = playerName.toLowerCase().trim();
             document.getElementById('ledgerOwnerTitle').innerText = playerName + "'s Passbook";
             const container = document.getElementById('ledgerStatementContainer');
             container.innerHTML = "";
+            
+            let totalDividendSavedAccumulator = 0; // Tracks the total cash savings gained via friend discounts
             let totalInvestedAccumulator = 0;
             let holdsChitFlag = false;
             let statementsFound = 0;
@@ -425,6 +423,7 @@
                     let computedCharge = 0;
                     let typeLabel = "";
                     let rowColor = "";
+                    let roundDiv = Math.round((log.finalBid || 0) / 9);
 
                     if (logWinnerLower === searchName) {
                         holdsChitFlag = true;
@@ -432,13 +431,12 @@
                         typeLabel = `🏆 Won Chit (Round ${roundNum})`;
                         rowColor = "border-emerald-500/30 bg-emerald-500/5";
                     } else {
-                        const roundDiv = Math.round((log.finalBid || 0) / 9);
                         computedCharge = 1500 - roundDiv;
                         if (computedCharge < 0) computedCharge = 0;
+                        totalInvestedAccumulator += roundDiv; // Track profit accumulation cleanly
                         typeLabel = `💸 Dividend Contribution (Round ${roundNum})`;
                         rowColor = "border-slate-800 bg-slate-900/40";
                     }
-                    totalInvestedAccumulator += computedCharge;
 
                     const row = document.createElement('div');
                     row.className = `border p-3 rounded-xl flex justify-between items-center text-xs ${rowColor}`;
@@ -446,18 +444,22 @@
                         <div>
                             <span class="text-[9px] font-bold text-slate-500 block">${log.timestamp}</span>
                             <span class="font-bold text-slate-200 mt-0.5 block">${typeLabel}</span>
+                            <span class="text-[10px] text-slate-400 block">Round Discount: ₹${log.finalBid} | Dividend Credit: +₹${logWinnerLower === searchName ? 0 : roundDiv}</span>
                         </div>
                         <div class="text-right">
                             <span class="text-white font-extrabold text-sm block">₹${computedCharge}</span>
+                            <span class="text-[10px] text-emerald-400 block font-medium">Status: Paid</span>
                         </div>
                     `;
                     container.appendChild(row);
                 });
             }
             if (statementsFound === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-6">No records found.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-6">No records found yet.</p>`;
             }
-            document.getElementById('ledgerTotalPaid').innerText = "₹" + totalInvestedAccumulator.toLocaleString('en-IN');
+            
+            // Render simplified readable total parameters as requested by the user
+            document.getElementById('ledgerTotalPaid').innerText = "₹" + totalInvestedAccumulator.toLocaleString('en-IN') + " Total Saved: ₹" + totalInvestedAccumulator;
             document.getElementById('ledgerChitStatus').innerText = holdsChitFlag ? "🏆 Yes" : "❌ No";
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('personalLedgerScreen').classList.remove('hidden');
@@ -505,8 +507,6 @@
         function triggerStartAuction() {
             if (activeUser.toLowerCase() !== 'bhagath') return;
             playSound('click'); eliminationsRef.remove();
-            
-            // Clean master flags on reset
             auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: true, isProcessing: false, forceQuitTriggered: false });
         }
 
@@ -523,25 +523,22 @@
             });
         }
 
-        // UPDATED QUIT LOGIC WITH BHAGATH MASTER DISCONNECT TRIGGER TRAP
         function triggerQuit() {
             if (!isAuctionActive || isUserAlreadyWinner) return;
-            
-            if (activeUser.toLowerCase() === 'bhagath') {
-                if (confirm("You are Bhagath! Clicking this will FORCE CLOSE the auction and kick all players out to the login page immediately. End round?")) {
-                    playSound('quit');
-                    // Push absolute terminate token to database to kick all nodes out simultaneously
-                    auctionStateRef.update({ forceQuitTriggered: true });
-                    setTimeout(() => {
-                        auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: false, isProcessing: false, forceQuitTriggered: false });
-                        eliminationsRef.remove();
-                    }, 1000);
-                    return;
-                }
-            } else {
-                if (confirm("Are you sure you want to quit this round?")) {
-                    playSound('quit'); eliminationsRef.push(activeUser);
-                }
+            if (confirm("Are you sure you want to quit from bidding this round?")) {
+                playSound('quit'); eliminationsRef.push(activeUser);
+            }
+        }
+
+        function triggerEmergencyClose() {
+            if (activeUser.toLowerCase() !== 'bhagath') return;
+            if (confirm("Are you sure you want to FORCE CLOSE the auction for everyone?")) {
+                playSound('quit');
+                auctionStateRef.update({ forceQuitTriggered: true });
+                setTimeout(() => {
+                    auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: false, isProcessing: false, forceQuitTriggered: false });
+                    eliminationsRef.remove();
+                }, 1000);
             }
         }
 
@@ -580,8 +577,10 @@
             if (isAuctionActive && !isProcessingWinner && Object.keys(compactUsers).length > 1) {
                 auctionStateRef.once('value', (stateSnap) => {
                     const s = stateSnap.val();
-                    if (activeCount === 1 && s && s.highestBidder !== "None Yet") {
-                        triggerWinnerResolution(s.highestBidder, s.highestBid);
+                    if (s && s.highestBidder !== "None Yet") {
+                        if (activeCount === 1) {
+                            triggerWinnerResolution(s.highestBidder, s.highestBid);
+                        }
                     }
                 });
             }
