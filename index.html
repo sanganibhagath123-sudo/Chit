@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V29 Pristine Edition</title>
+    <title>Premium 15K Chit Auction - V31 Complete Fixed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -39,7 +39,7 @@
     <!-- MAIN DASHBOARD -->
     <div id="mainScreen" class="w-full max-w-md hidden opacity-0 transition-all duration-500 space-y-5 pb-8">
         
-        <!-- Header: CHANGE NAME COMPLETELY REMOVED -->
+        <!-- Header -->
         <header class="flex items-center justify-between pt-2">
             <div>
                 <span class="text-xs font-bold text-amber-500 tracking-widest uppercase">Live Portal</span>
@@ -390,6 +390,7 @@
                 if (totalQuitBiddersCount === (totalJoinedBiddersCount - 1) && currentWinnerCandidate !== "None Yet") {
                     auctionStateRef.once('value', (stateSnap) => {
                         const s = stateSnap.val();
+                        if (s && s.isProcessing) return;
                         const finalBidAmt = s ? (s.highestBid || 0) : 0;
                         triggerWinnerResolution(currentWinnerCandidate, finalBidAmt);
                     });
@@ -402,7 +403,7 @@
 
             auctionStateRef.once('value', (stateSnap) => {
                 const s = stateSnap.val();
-                if (!s) return;
+                if (!s || s.isProcessing) return;
                 
                 const currentLeaderName = s.highestBidder ? s.highestBidder.toLowerCase().trim() : "none yet";
                 const currentBidAmt = s.highestBid || 0;
@@ -457,16 +458,23 @@
             if (show) m.classList.remove('hidden'); else m.classList.add('hidden');
         }
 
+        // 100% FIXED STRICTOR RE-RENDER SCRUBBER
         function updateHistoryUI(data) {
             const container = document.getElementById('historyLogs');
-            container.innerHTML = "";
+            container.innerHTML = ""; // Scrub it completely clean
             if (!data) {
                 container.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-4">No winners recorded yet.</p>`;
                 return;
             }
             
-            Object.keys(data).reverse().forEach(key => {
-                const log = data[key];
+            // Clean local object mapping to fully eliminate visual mirroring bugs on sync fires
+            const pristineMap = {};
+            Object.keys(data).forEach(key => {
+                pristineMap[key] = data[key];
+            });
+
+            Object.keys(pristineMap).reverse().forEach(key => {
+                const log = pristineMap[key];
                 const card = document.createElement('div');
                 card.className = "bg-slate-900/90 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between text-xs shadow-sm mb-2";
                 card.innerHTML = `
@@ -493,6 +501,7 @@
             playSound('click');
             auctionStateRef.once('value', (snapshot) => {
                 const data = snapshot.val();
+                if (data && data.isProcessing) return;
                 const currentBid = data ? (data.highestBid || 0) : 0;
                 const currentLeader = data ? data.highestBidder : "None Yet";
                 let newBid = (currentLeader === "None Yet" || currentBid === 0) ? 100 : currentBid + 50;
@@ -509,7 +518,9 @@
         }
 
         function triggerWinnerResolution(winnerName, finalBid) {
+            if (isProcessingWinner) return;
             isProcessingWinner = true;
+            
             auctionStateRef.update({ isProcessing: true });
             
             globalLatestBidAmount = finalBid;
@@ -537,12 +548,17 @@
                 timestamp: dateString
             };
 
+            // STRICT SINGLE REFERENCE PUSH CONSTRAINT
+            if (activeUser.toLowerCase().trim() === winnerName.toLowerCase().trim()) {
+                auctionHistoryRef.push(roundDataToken);
+            }
+
             setTimeout(() => {
-                auctionHistoryRef.push(roundDataToken).then(() => {
+                if (activeUser.toLowerCase() === 'bhagath' || activeUser.toLowerCase().trim() === winnerName.toLowerCase().trim()) {
                     if (banner) banner.classList.add('hidden');
                     eliminationsRef.remove();
                     auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: false, isProcessing: false });
-                });
+                }
             }, 5000);
         }
 
