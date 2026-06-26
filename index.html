@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V40 Final Edition</title>
+    <title>Premium 15K Chit Auction - V42 Final Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); }
@@ -36,33 +36,25 @@
             <!-- HIGH-FIDELITY CARTOON VECTOR ILLUSTRATION MATCHING USER'S PHOTO -->
             <div class="w-full max-w-[240px] mx-auto bg-slate-900/40 rounded-2xl border border-slate-800/80 p-2 relative">
                 <svg viewBox="0 0 200 150" class="w-full h-auto drop-shadow-[0_10px_15px_rgba(245,158,11,0.1)]">
-                    <!-- Dynamic Spark debris elements triggered right on hit -->
                     <g fill="#f59e0b" opacity="0.8">
                         <circle cx="45" cy="115" r="3" class="animate-ping" style="animation-duration: 1.4s" />
                         <circle cx="115" cy="120" r="2.5" />
                         <path d="M 35 110 L 25 105 L 30 115 Z" />
                         <path d="M 125 112 L 138 108 L 130 118 Z" />
                     </g>
-                    
-                    <!-- Sound Anvil Base Block -->
                     <g transform="translate(40, 110)">
                         <ellipse cx="40" cy="15" rx="38" ry="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
                         <path d="M 2,15 A 38,12 0 0,0 78,15 L 78,25 A 38,12 0 0,1 2,25 Z" fill="#0f172a" stroke="#334155" stroke-width="2"/>
                         <ellipse cx="40" cy="15" rx="32" ry="8" fill="#334155"/>
                     </g>
-                    
-                    <!-- Moving Hand Holding Gavel Group -->
                     <g class="animate-gavel">
-                        <!-- Wooden Mallet Head -->
                         <g transform="translate(60, 50) rotate(-15)">
                             <rect x="0" y="0" width="30" height="45" rx="4" fill="#b45309" stroke="#78350f" stroke-width="2"/>
                             <rect x="-3" y="6" width="36" height="6" fill="#f59e0b"/>
                             <rect x="-3" y="33" width="36" height="6" fill="#f59e0b"/>
-                            <!-- Handle shaft connection -->
                             <path d="M 15,22 L 85,32" stroke="#d97706" stroke-width="7" stroke-linecap="round"/>
                             <path d="M 15,22 L 85,32" stroke="#78350f" stroke-width="7" stroke-linecap="round" opacity="0.3"/>
                         </g>
-                        <!-- Arm Sleeve and fist wrapped tightly around mallet shaft -->
                         <path d="M 130,85 C 122,85 115,80 115,75 C 115,68 125,62 135,62 L 180,50 L 185,78 Z" fill="#ffedd5" stroke="#78350f" stroke-width="2"/>
                         <g fill="#fde047" stroke="#78350f" stroke-width="1.5">
                             <rect x="115" y="68" width="10" height="7" rx="3"/>
@@ -72,8 +64,6 @@
                         </g>
                     </g>
                 </svg>
-                
-                <!-- Micro-badge tag tracker -->
                 <span class="absolute top-2 right-2 flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
@@ -300,6 +290,7 @@
             updateHistoryUI(data);
         });
 
+        // FIXED AND SYNCHRONIZED ELIMINATION LISTENER TRIGGERING REALTIME RED BADGES
         eliminationsRef.on('value', (snapshot) => {
             quitPlayersRoundList = [];
             const data = snapshot.val();
@@ -308,6 +299,8 @@
                     quitPlayersRoundList.push(name.toLowerCase().trim());
                 });
             }
+            // Retrigger presence rendering so live updates show immediately without requiring page refresh
+            triggerPresenceUIRender();
             evaluateLiveBiddingLogicState();
             checkAndTriggerAutoWinCondition();
         });
@@ -413,65 +406,73 @@
         }
 
         presenceRef.on('value', (snapshot) => {
-            const usersListEl = document.getElementById('activeUsersList');
-            const countEl = document.getElementById('onlineCount');
-            const data = snapshot.val();
-            
-            currentOnlineNames = [];
-            if (!data) { countEl.innerText = "0 Online"; return; }
-            
-            usersListEl.innerHTML = "";
-            const compactUsers = {};
-            Object.values(data).forEach(u => {
-                const normalized = u.name.toLowerCase().trim();
-                compactUsers[normalized] = u.name;
-                currentOnlineNames.push(normalized);
-            });
-            countEl.innerText = Object.keys(compactUsers).length + " Online";
+            triggerPresenceUIRender();
+        });
 
-            let totalJoinedBiddersCount = 0;
-            let totalQuitBiddersCount = 0;
-            let currentWinnerCandidate = "None Yet";
-
-            Object.values(compactUsers).forEach(name => {
-                const nameLower = name.toLowerCase().trim();
-                const isEliminated = quitPlayersRoundList.includes(nameLower);
-                const isWinnerPast = pastWinnersList.includes(nameLower);
+        // DEDICATED PRESENCE RENDERER THAT CRITICALLY APPLIES RED BORDERS AND HIGHLIGHTS ON QUIT
+        function triggerPresenceUIRender() {
+            presenceRef.once('value', (snapshot) => {
+                const usersListEl = document.getElementById('activeUsersList');
+                const countEl = document.getElementById('onlineCount');
+                const data = snapshot.val();
                 
-                if (!isWinnerPast) {
-                    totalJoinedBiddersCount++;
-                    if (isEliminated) {
-                        totalQuitBiddersCount++;
+                currentOnlineNames = [];
+                if (!data) { countEl.innerText = "0 Online"; usersListEl.innerHTML = '<span class="text-xs text-slate-500 italic">No one online yet</span>'; return; }
+                
+                usersListEl.innerHTML = "";
+                const compactUsers = {};
+                Object.values(data).forEach(u => {
+                    const normalized = u.name.toLowerCase().trim();
+                    compactUsers[normalized] = u.name;
+                    currentOnlineNames.push(normalized);
+                });
+                countEl.innerText = Object.keys(compactUsers).length + " Online";
+
+                let totalJoinedBiddersCount = 0;
+                let totalQuitBiddersCount = 0;
+                let currentWinnerCandidate = "None Yet";
+
+                Object.values(compactUsers).forEach(name => {
+                    const nameLower = name.toLowerCase().trim();
+                    const isEliminated = quitPlayersRoundList.includes(nameLower);
+                    const isWinnerPast = pastWinnersList.includes(nameLower);
+                    
+                    if (!isWinnerPast) {
+                        totalJoinedBiddersCount++;
+                        if (isEliminated) {
+                            totalQuitBiddersCount++;
+                        } else {
+                            currentWinnerCandidate = name;
+                        }
+                    }
+
+                    const badge = document.createElement('span');
+                    if (isWinnerPast) {
+                        badge.className = "text-xs bg-slate-900/60 border border-slate-800 text-slate-500 px-3 py-1 rounded-full line-through";
+                        badge.innerHTML = `🏅 ${name}`;
+                    } else if (isEliminated) {
+                        // FIXED: Absolute solid high-visibility red badge rendering so everyone immediately identifies who hit QUIT
+                        badge.className = "text-xs bg-rose-950/80 border-2 border-rose-500 text-rose-400 px-3 py-1 rounded-full font-extrabold shadow-md flex items-center gap-1 animate-pulse shadow-rose-900/30";
+                        badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-0.5"></span> 🔴 ${name} (Quit)`;
                     } else {
-                        currentWinnerCandidate = name;
+                        badge.className = "text-xs bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1 rounded-full flex items-center gap-1";
+                        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${name}`;
+                    }
+                    usersListEl.appendChild(badge);
+                });
+
+                if (isAuctionActive && !isProcessingWinner && totalJoinedBiddersCount > 1) {
+                    if (totalQuitBiddersCount === (totalJoinedBiddersCount - 1) && currentWinnerCandidate !== "None Yet") {
+                        auctionStateRef.once('value', (stateSnap) => {
+                            const s = stateSnap.val();
+                            if (s && s.isProcessing) return;
+                            const finalBidAmt = s ? (s.highestBid || 0) : 0;
+                            triggerWinnerResolution(currentWinnerCandidate, finalBidAmt);
+                        });
                     }
                 }
-
-                const badge = document.createElement('span');
-                if (isWinnerPast) {
-                    badge.className = "text-xs bg-slate-900/60 border border-slate-800 text-slate-500 px-3 py-1 rounded-full line-through";
-                    badge.innerHTML = `🏅 ${name}`;
-                } else if (isEliminated) {
-                    badge.className = "text-xs bg-rose-950/40 border-2 border-rose-600 text-rose-400 px-3 py-1 rounded-full font-bold shadow-md flex items-center gap-1 animate-pulse";
-                    badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-rose-600 mr-0.5"></span> 🔴 ${name} (Quit)`;
-                } else {
-                    badge.className = "text-xs bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1 rounded-full flex items-center gap-1";
-                    badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${name}`;
-                }
-                usersListEl.appendChild(badge);
             });
-
-            if (isAuctionActive && !isProcessingWinner && totalJoinedBiddersCount > 1) {
-                if (totalQuitBiddersCount === (totalJoinedBiddersCount - 1) && currentWinnerCandidate !== "None Yet") {
-                    auctionStateRef.once('value', (stateSnap) => {
-                        const s = stateSnap.val();
-                        if (s && s.isProcessing) return;
-                        const finalBidAmt = s ? (s.highestBid || 0) : 0;
-                        triggerWinnerResolution(currentWinnerCandidate, finalBidAmt);
-                    });
-                }
-            }
-        });
+        }
 
         function checkAndTriggerAutoWinCondition() {
             if (!isAuctionActive || isProcessingWinner || currentOnlineNames.length === 0) return;
@@ -566,7 +567,6 @@
             auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: true, isProcessing: false });
         }
 
-        /* Standard Bidding Hook */
         function placeBid() {
             if (!isAuctionActive || isUserAlreadyWinner) return;
             playSound('click');
