@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium 15K Chit Auction - V35 Ultimate Fix</title>
+    <title>Premium 15K Chit Auction - V36 Take-Home Freeze</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -174,8 +174,11 @@
         let globalLatestWinnerName = "";
         let myPresenceKey = null;
 
-        let isMonthlyPayFrozen = false;
-        let frozenMonthlyPayValueStr = "₹1,500";
+        // UI Freeze State Tracking
+        let isUIValueLocked = false;
+        let frozenBidText = "₹0";
+        let frozenTakeHomeText = "₹14,500";
+        let frozenMonthlyPayText = "₹1,500";
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -262,20 +265,24 @@
             const currentBid = (data && data.highestBid !== undefined) ? data.highestBid : 0;
             const currentLeader = data ? data.highestBidder : "None Yet";
 
-            document.getElementById('highestBid').innerText = "₹" + currentBid;
             document.getElementById('highestBidder').innerText = currentLeader;
-            document.getElementById('takeHomeDisplay').innerText = "₹" + (initialPoolValue - currentBid);
             document.getElementById('auctionStatusLabel').innerText = isAuctionActive ? "LIVE RUNNING" : "WAITING";
             document.getElementById('auctionStatusLabel').className = isAuctionActive ? "text-xs font-bold text-emerald-400" : "text-xs font-bold text-amber-400";
             
-            if (!isMonthlyPayFrozen) {
+            // FIX RESET PROBLEM: Only rewrite values if UI is not frozen by a recent win!
+            if (!isUIValueLocked) {
+                frozenBidText = "₹" + currentBid;
+                frozenTakeHomeText = "₹" + (initialPoolValue - currentBid);
+                
                 const liveDividend = currentBid / 10;
                 const estimatedPay = Math.round(1500 - liveDividend);
-                frozenMonthlyPayValueStr = "₹" + (estimatedPay < 0 ? 0 : estimatedPay);
-                document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayValueStr;
-            } else {
-                document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayValueStr;
+                frozenMonthlyPayText = "₹" + (estimatedPay < 0 ? 0 : estimatedPay);
             }
+
+            // Always project the current state tokens accurately
+            document.getElementById('highestBid').innerText = frozenBidText;
+            document.getElementById('takeHomeDisplay').innerText = frozenTakeHomeText;
+            document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayText;
 
             evaluateLiveBiddingLogicState();
             checkAndTriggerAutoWinCondition();
@@ -442,7 +449,6 @@
             });
         }
 
-        // BUG FIX: Completely removed the strict block duplicate blocker logic from crashing login entrance.
         function enterAuctionRoom() {
             const name = document.getElementById('joinUsername').value.trim();
             if (!name) { alert("Please enter your name first!"); return; }
@@ -450,7 +456,11 @@
             activeUser = name;
             localStorage.setItem('chit_session_username', activeUser);
             
+            // Clear layout freeze on login
+            isUIValueLocked = false;
+
             const userPresenceRef = presenceRef.push();
+            myPresenceKey = userPresenceRef.key;
             userPresenceRef.set({ name: activeUser });
             userPresenceRef.onDisconnect().remove();
 
@@ -462,11 +472,6 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
             setTimeout(() => document.getElementById('mainScreen').classList.add('opacity-100'), 50);
-        }
-
-        function clearNameAndReload() {
-            localStorage.removeItem('chit_session_username');
-            location.reload();
         }
 
         function toggleWinnerModal(show) {
@@ -483,10 +488,8 @@
             }
             
             const uniqueTimestampTracker = new Set();
-
             Object.keys(data).reverse().forEach(key => {
                 const log = data[key];
-                
                 if (uniqueTimestampTracker.has(log.timestamp)) return; 
                 uniqueTimestampTracker.add(log.timestamp);
 
@@ -507,7 +510,12 @@
 
         function triggerStartAuction() {
             if (activeUser.toLowerCase() !== 'bhagath') return;
-            playSound('click'); eliminationsRef.remove();
+            playSound('click'); 
+            eliminationsRef.remove();
+            
+            // UNLOCK Values instantly when Bhagath triggers a brand new month auction round!
+            isUIValueLocked = false;
+            
             auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: true, isProcessing: false });
         }
 
@@ -543,11 +551,26 @@
         function triggerWinnerResolution(winnerName, finalBid) {
             if (isProcessingWinner) return;
             isProcessingWinner = true;
+            
+            // LOCK ALL NUMBERS ON SCREEN IMMEDIATELY AT THE WINNING MOMENT!
+            isUIValueLocked = true;
+            frozenBidText = "₹" + finalBid;
+            const takeHomeAmt = initialPoolValue - finalBid;
+            frozenTakeHomeText = "₹" + takeHomeAmt;
+            
+            const finalDividendCalculated = finalBid / 10;
+            const finalPayAmt = Math.round(1500 - finalDividendCalculated);
+            frozenMonthlyPayText = "₹" + (finalPayAmt < 0 ? 0 : finalPayAmt);
+
+            // Push frozen tokens immediately into view strings
+            document.getElementById('highestBid').innerText = frozenBidText;
+            document.getElementById('takeHomeDisplay').innerText = frozenTakeHomeText;
+            document.getElementById('liveMonthlyPayDisplay').innerText = frozenMonthlyPayText;
+
             auctionStateRef.update({ isProcessing: true });
             
             globalLatestBidAmount = finalBid;
             globalLatestWinnerName = winnerName;
-            const takeHomeAmt = initialPoolValue - finalBid;
             const finalStringDisplay = `₹${takeHomeAmt} won`;
             
             playSound('winner');
@@ -578,6 +601,7 @@
                 if (activeUser.toLowerCase() === 'bhagath' || activeUser.toLowerCase().trim() === winnerName.toLowerCase().trim()) {
                     if (banner) banner.classList.add('hidden');
                     eliminationsRef.remove();
+                    // Firebase sets to 0 but our UI remains locked onto frozen values until next round starts!
                     auctionStateRef.set({ highestBid: 0, highestBidder: "None Yet", isStarted: false, isProcessing: false });
                 }
             }, 5000);
@@ -589,7 +613,7 @@
             }
             if (myPresenceKey) database.ref('chitLive/presence/' + myPresenceKey).remove();
             localStorage.removeItem('chit_session_username');
-            activeUser = ""; myPresenceKey = null; isMonthlyPayFrozen = false;
+            activeUser = ""; myPresenceKey = null; isUIValueLocked = false;
             document.getElementById('mainScreen').classList.add('hidden');
             document.getElementById('adminControlsContainer').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
